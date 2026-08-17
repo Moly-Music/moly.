@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#070b1e">
-<meta name="description" content="Moly — reproductor musical neon para Milo J">
-<title>Moly — Music Player</title>
+<meta name="description" content="RitmoSL — reproductor musical neon para Milo J">
+<title>RitmoSL · Tu reproductor de música</title>
 <style>
 :root{
   --bg:#050817; --panel:rgba(12,18,45,.72); --panel2:rgba(17,25,58,.62);
-  --cyan:#28f4ff; --pink:#ff3d81; --violet:#8c5cff; --text:#f7f8ff;
-  --muted:#8f9abf; --line:rgba(255,255,255,.10);
+  --cyan:#ff4fd8; --pink:#ff3d81; --violet:#8c5cff; --text:#f7f8ff;
+  --muted:#ad9ab8; --line:rgba(255,255,255,.10);
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
@@ -72,7 +72,7 @@ body:after{
 .mainplay{width:62px;height:62px;border-radius:22px;border:0;cursor:pointer;background:linear-gradient(135deg,var(--pink),#784cff);color:white;font-size:25px;box-shadow:0 0 28px rgba(255,61,129,.28)}
 .vol{width:92px}.vol input{width:100%;accent-color:var(--cyan)}
 .visual{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:38px;margin:8px 0 2px}
-.bar{width:4px;border-radius:10px;background:linear-gradient(#28f4ff,#ff3d81);height:8px;animation:eq .8s ease-in-out infinite alternate;animation-play-state:paused;box-shadow:0 0 9px rgba(40,244,255,.55)}
+.bar{width:4px;border-radius:10px;background:linear-gradient(#ff4fd8,#ff3d81);height:8px;animation:eq .8s ease-in-out infinite alternate;animation-play-state:paused;box-shadow:0 0 9px rgba(40,244,255,.55)}
 .playing .bar{animation-play-state:running}
 .bar:nth-child(2){animation-delay:.1s}.bar:nth-child(3){animation-delay:.25s}.bar:nth-child(4){animation-delay:.05s}.bar:nth-child(5){animation-delay:.3s}.bar:nth-child(6){animation-delay:.15s}.bar:nth-child(7){animation-delay:.35s}.bar:nth-child(8){animation-delay:.2s}
 @keyframes eq{to{height:34px}}
@@ -83,6 +83,68 @@ body:after{
 .card h3{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--cyan);margin:0 0 8px}
 .card p{margin:0;color:#c3c8df;font-size:12px;line-height:1.55}
 @media(max-width:520px){.infoGrid{grid-template-columns:1fr}.weather{padding:8px 10px}.logo{font-size:30px}.vol{width:74px}}
+
+/* RitmoSL visual identity */
+body{
+  background:
+    radial-gradient(circle at 15% 0%, rgba(255,79,216,.12), transparent 34%),
+    radial-gradient(circle at 90% 20%, rgba(155,92,255,.12), transparent 32%),
+    linear-gradient(145deg,#07050d,#0b0712 48%,#07050d);
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:linear-gradient(to bottom,black,transparent 82%);
+}
+.logo{
+  letter-spacing:-1.5px;
+  text-shadow:0 0 18px rgba(255,79,216,.34),0 0 42px rgba(155,92,255,.18);
+}
+.tagline{
+  color:#ad9ab8;
+  font-size:10px;
+  letter-spacing:2.2px;
+  text-transform:uppercase;
+  margin-top:-3px;
+}
+.weather{
+  border-color:rgba(255,79,216,.22)!important;
+  box-shadow:0 0 24px rgba(255,79,216,.06);
+}
+.player{
+  border-color:rgba(255,79,216,.22)!important;
+  box-shadow:0 20px 80px rgba(0,0,0,.45),0 0 42px rgba(155,92,255,.07);
+}
+.mainplay{
+  background:linear-gradient(135deg,#ff4fd8,#9b5cff)!important;
+  box-shadow:0 0 28px rgba(255,79,216,.25);
+}
+.mainplay:hover{box-shadow:0 0 38px rgba(255,79,216,.4);transform:translateY(-1px)}
+.search button{
+  background:linear-gradient(135deg,#ff4fd8,#9b5cff)!important;
+}
+.track.active{
+  border-color:rgba(255,79,216,.45)!important;
+  box-shadow:inset 0 0 28px rgba(255,79,216,.05);
+}
+.cover{
+  background:linear-gradient(135deg,#ff4fd8,#9b5cff)!important;
+  box-shadow:0 0 22px rgba(255,79,216,.2);
+}
+.card{
+  border-color:rgba(255,79,216,.16)!important;
+  background:rgba(255,255,255,.035)!important;
+}
+.card h3{color:#ff7a3d!important}
+.vol input{accent-color:#ff4fd8!important}
+.footer{color:#8f7e9b!important}
+
 </style>
 </head>
 <body>
@@ -97,7 +159,7 @@ body:after{
 
   <section class="hero">
     <div class="badge"><span class="live-dot"></span> MOOD · MILO J</div>
-    <h1 class="title">Tu música.<br><span style="color:var(--cyan)">Tu Moly.</span></h1>
+    <h1 class="title">Tu música.<br><span style="color:var(--cyan)">Tu RitmoSL.</span></h1>
     <p class="subtitle">Canciones solo de Milo J — Próximamente serán añadidas más.</p>
 
     <div class="search">
@@ -114,14 +176,14 @@ body:after{
             <div style="font-size:38px;margin-bottom:8px">▶</div>
             <strong>El reproductor de YouTube necesita una página web</strong>
             <p style="color:#9ca7c8;font-size:12px;line-height:1.5">Este HTML está abierto como archivo local. Chrome/YouTube puede bloquear el reproductor incrustado (Error 153). Abrí la canción con el botón de abajo.</p>
-            <button id="ytOpen" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#28f4ff,#628dff);font-weight:900;cursor:pointer">ABRIR EN YOUTUBE</button>
+            <button id="ytOpen" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#ff4fd8,#628dff);font-weight:900;cursor:pointer">ABRIR EN YOUTUBE</button>
           </div>
         </div>
         <div class="vignette"></div>
       </div>
       <div class="meta">
         <div class="disc"></div>
-        <div style="min-width:0;flex:1"><h2 id="nowTitle">Elegí una canción</h2><p id="nowArtist">Milo J · Moly</p></div>
+        <div style="min-width:0;flex:1"><h2 id="nowTitle">Elegí una canción</h2><p id="nowArtist">Milo J · RitmoSL</p></div>
       </div>
       <div class="visual" id="visual">
         <i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i><i class="bar"></i>
@@ -147,7 +209,7 @@ body:after{
     </div>
   </div>
 
-  <div class="footer">Moly · interfaz original · reproductor oficial de YouTube</div>
+  <div class="footer">RitmoSL · interfaz original · reproductor oficial de YouTube</div>
 </main>
 
 
@@ -234,7 +296,7 @@ function render(list=songs){
   $("#results").innerHTML = list.length ? list.map(s=>`
     <div class="track ${current?.title===s.title?'active':''}" data-title="${s.title.replace(/"/g,'&quot;')}">
       <div class="cover">M</div><div><strong>${s.title}</strong><small>Milo J · YouTube${s.id?'':' · buscar en YouTube'}</small></div><div class="go">›</div>
-    </div>`).join("") : `<div class="small" style="padding:10px">No encontré esa canción en el catálogo de Moly.</div>`;
+    </div>`).join("") : `<div class="small" style="padding:10px">No encontré esa canción en el catálogo de RitmoSL.</div>`;
   document.querySelectorAll(".track").forEach(x=>x.onclick=()=>selectSong(songs.find(s=>s.title===x.dataset.title)));
 }
 function search(){
@@ -298,7 +360,7 @@ function selectSong(song){
   current=song;
   localStorage.setItem(SONG_KEY,JSON.stringify({title:song.title}));
   $("#nowTitle").textContent=song.title;
-  $("#nowArtist").textContent="Milo J · Moly";
+  $("#nowArtist").textContent="Milo J · RitmoSL";
   render(norm($("#search").value) ? songs.filter(s=>norm(s.title+" "+s.tags).includes(norm($("#search").value))) : songs);
 
   const saved=getPosition(song.id);
@@ -307,7 +369,7 @@ function selectSong(song){
   }else{
     ytPlayer=null;
     isReady=false;
-    $("#yt").innerHTML=`<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:#b9c1df;background:radial-gradient(circle at 50% 30%,rgba(40,244,255,.12),transparent 55%);"><div><div style="font-size:42px;margin-bottom:10px">▶</div><strong>Esta canción está en el catálogo</strong><p style="font-size:12px;line-height:1.5;color:#8f9abf;margin:8px 0 14px">El reproductor de YouTube se abrirá con la búsqueda oficial de la canción.</p><button id="ytSearch" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#28f4ff,#628dff);font-weight:900;cursor:pointer">BUSCAR EN YOUTUBE</button></div></div>`;
+    $("#yt").innerHTML=`<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:#b9c1df;background:radial-gradient(circle at 50% 30%,rgba(40,244,255,.12),transparent 55%);"><div><div style="font-size:42px;margin-bottom:10px">▶</div><strong>Esta canción está en el catálogo</strong><p style="font-size:12px;line-height:1.5;color:#ad9ab8;margin:8px 0 14px">El reproductor de YouTube se abrirá con la búsqueda oficial de la canción.</p><button id="ytSearch" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#ff4fd8,#628dff);font-weight:900;cursor:pointer">BUSCAR EN YOUTUBE</button></div></div>`;
     $("#ytSearch").onclick=()=>window.open("https://www.youtube.com/results?search_query="+encodeURIComponent("Milo J "+song.title),"_blank","noopener");
     $("#playBtn").textContent="▶";
     $("#playerCard").classList.remove("playing");
