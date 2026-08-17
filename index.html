@@ -68,9 +68,9 @@ body:after{
 .meta .disc{width:54px;height:54px;border-radius:50%;background:repeating-radial-gradient(circle,#10152b 0 4px,#1b2241 5px 7px);border:1px solid rgba(255,255,255,.12);display:grid;place-items:center;box-shadow:0 0 22px rgba(40,244,255,.15)}
 .disc:after{content:"";width:12px;height:12px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
 .meta h2{margin:0;font-size:17px}.meta p{margin:4px 0 0;color:var(--muted);font-size:12px}
-.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
+.controls{display:flex;align-items:center;gap:12px;margin-top:6px}
 .mainplay{width:62px;height:62px;border-radius:22px;border:0;cursor:pointer;background:linear-gradient(135deg,var(--pink),#784cff);color:white;font-size:25px;box-shadow:0 0 28px rgba(255,61,129,.28)}
-.vol{width:180px;display:flex;align-items:center;gap:8px}.vol input{width:100%;accent-color:var(--cyan)}
+.vol{width:92px}.vol input{width:100%;accent-color:var(--cyan)}
 .visual{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:38px;margin:8px 0 2px}
 .bar{width:4px;border-radius:10px;background:linear-gradient(#28f4ff,#ff3d81);height:8px;animation:eq .8s ease-in-out infinite alternate;animation-play-state:paused;box-shadow:0 0 9px rgba(40,244,255,.55)}
 .playing .bar{animation-play-state:running}
@@ -138,19 +138,13 @@ const songs = [
   {title:"Rara Vez", id:"aBSkvI0CkgU", tags:"rara vez"},
   {title:"Morocha", id:"jMNRg3nHwU0", tags:"morocha"},
   {title:"Milagrosa", id:"9AEpbNi88F0", tags:"milagrosa"},
-  {title:"Rincón", id:"Qip3xXCTzh4", tags:"rincon rincón"},
-  {title:"Fruto", id:"VnQx7h9QwJY", tags:"fruto"},
-  {title:"Toy en el Mic", id:"W8lZ2wFQ7pQ", tags:"toy en el mic"},
-  {title:"Al Sol", id:"x8L3fK7sH9A", tags:"al sol"},
-  {title:"La Vuelta", id:"n4mQ8yR2cTg", tags:"la vuelta"},
-  {title:"Domingo", id:"q6Kp2sV9aLc", tags:"domingo"}
+  {title:"Rincón", id:"Qip3xXCTzh4", tags:"rincon rincón"}
 ];
 
 let ytPlayer = null;
 let current = null;
 let playerReady = false;
 let saveTimer = null;
-let lastKnownTime = 0;
 
 const $ = s => document.querySelector(s);
 
@@ -158,25 +152,24 @@ function norm(s){
   return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
 }
 
-function storageKey(song){
+function positionKey(song){
   return "moly_position_" + song.id;
 }
 
-function savePosition(){
-  if(!current || !ytPlayer || !ytPlayer.getCurrentTime) return;
-  try{
-    const t = ytPlayer.getCurrentTime() || 0;
-    if(t > 0){
-      localStorage.setItem(storageKey(current), String(t));
-      localStorage.setItem("moly_song", JSON.stringify(current));
-      lastKnownTime = t;
-    }
-  }catch(e){}
+function getSavedPosition(song){
+  const n = Number(localStorage.getItem(positionKey(song)));
+  return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
-function savedPosition(song){
-  const n = Number(localStorage.getItem(storageKey(song)));
-  return Number.isFinite(n) && n > 0 ? n : 0;
+function savePosition(){
+  if(!current || !ytPlayer || typeof ytPlayer.getCurrentTime !== "function") return;
+  try{
+    const time = ytPlayer.getCurrentTime() || 0;
+    if(time > 0){
+      localStorage.setItem(positionKey(current), String(time));
+      localStorage.setItem("moly_song", JSON.stringify(current));
+    }
+  }catch(e){}
 }
 
 function render(list=songs){
@@ -198,65 +191,63 @@ function search(){
   render(q ? songs.filter(s=>norm(s.title+" "+s.tags).includes(q)) : songs);
 }
 
-$("#search").addEventListener("input",search);
-$("#searchBtn").onclick=search;
+$("#search").addEventListener("input", search);
+$("#searchBtn").onclick = search;
 
-function onYouTubeReady(){
-  if(!current) return;
+function makePlayer(song, autoplay=false){
+  playerReady=false;
 
-  ytPlayer = new YT.Player("yt",{
-    videoId:current.id,
+  if(ytPlayer && typeof ytPlayer.destroy === "function"){
+    try{ ytPlayer.destroy(); }catch(e){}
+  }
+
+  $("#yt").innerHTML = "";
+
+  const start = Math.floor(getSavedPosition(song));
+
+  ytPlayer = new YT.Player("yt", {
+    videoId: song.id,
     playerVars:{
-      autoplay:0,
-      playsinline:1,
-      rel:0,
-      modestbranding:1,
-      controls:1
+      autoplay: autoplay ? 1 : 0,
+      playsinline: 1,
+      rel: 0,
+      modestbranding: 1,
+      controls: 1,
+      start: start
     },
     events:{
-      onReady:e=>{
+      onReady: event=>{
         playerReady=true;
-        e.target.setVolume(100);
+        event.target.setVolume(100);
         $("#volume").value=100;
 
-        const pos=savedPosition(current);
-        if(pos>0){
-          try{e.target.seekTo(pos,true)}catch(err){}
+        if(start > 0){
+          try{ event.target.seekTo(start, true); }catch(e){}
         }
+
+        $("#playBtn").textContent = autoplay ? "❚❚" : "▶";
+        $("#playerCard").classList.toggle("playing", autoplay);
       },
-      onStateChange:e=>{
-        if(e.data===YT.PlayerState.PLAYING){
+
+      onStateChange: event=>{
+        if(event.data === YT.PlayerState.PLAYING){
           $("#playBtn").textContent="❚❚";
           $("#playerCard").classList.add("playing");
         }else{
           $("#playBtn").textContent="▶";
           $("#playerCard").classList.remove("playing");
 
-          if(
-            e.data===YT.PlayerState.PAUSED ||
-            e.data===YT.PlayerState.ENDED
-          ) savePosition();
-        }
+          if(event.data === YT.PlayerState.PAUSED){
+            savePosition();
+          }
 
-        if(e.data===YT.PlayerState.ENDED && current){
-          localStorage.removeItem(storageKey(current));
+          if(event.data === YT.PlayerState.ENDED){
+            localStorage.removeItem(positionKey(current));
+          }
         }
       }
     }
   });
-}
-
-function loadYouTubeAPI(){
-  if(window.YT && window.YT.Player){
-    onYouTubeReady();
-    return;
-  }
-
-  window.onYouTubeIframeAPIReady=onYouTubeReady;
-
-  const script=document.createElement("script");
-  script.src="https://www.youtube.com/iframe_api";
-  document.body.appendChild(script);
 }
 
 function selectSong(song){
@@ -265,76 +256,36 @@ function selectSong(song){
   savePosition();
 
   current=song;
-  lastKnownTime=savedPosition(song);
-
-  localStorage.setItem("moly_song",JSON.stringify(song));
+  localStorage.setItem("moly_song", JSON.stringify(song));
 
   $("#nowTitle").textContent=song.title;
   $("#nowArtist").textContent="Milo J · Moly";
 
-  render(
-    norm($("#search").value)
-      ? songs.filter(s=>norm(s.title+" "+s.tags).includes(norm($("#search").value)))
-      : songs
-  );
+  const q=norm($("#search").value);
+  render(q ? songs.filter(s=>norm(s.title+" "+s.tags).includes(q)) : songs);
 
-  playerReady=false;
-  $("#yt").innerHTML="";
-
-  const pos=savedPosition(song);
-
-  // Recreate the official YouTube player.
-  ytPlayer=new YT.Player("yt",{
-    videoId:song.id,
-    playerVars:{
-      autoplay:0,
-      playsinline:1,
-      rel:0,
-      modestbranding:1,
-      controls:1,
-      start:Math.floor(pos)
-    },
-    events:{
-      onReady:e=>{
-        playerReady=true;
-        e.target.setVolume(100);
-        $("#volume").value=100;
-
-        if(pos>0){
-          try{e.target.seekTo(pos,true)}catch(err){}
-        }
-      },
-      onStateChange:e=>{
-        if(e.data===YT.PlayerState.PLAYING){
-          $("#playBtn").textContent="❚❚";
-          $("#playerCard").classList.add("playing");
-        }else{
-          $("#playBtn").textContent="▶";
-          $("#playerCard").classList.remove("playing");
-
-          if(e.data===YT.PlayerState.PAUSED) savePosition();
-          if(e.data===YT.PlayerState.ENDED) localStorage.removeItem(storageKey(song));
-        }
-      }
-    }
-  });
+  if(window.YT && YT.Player){
+    makePlayer(song, false);
+  }
 }
 
 $("#playBtn").onclick=()=>{
   if(!current || !ytPlayer || !playerReady) return;
 
-  const state=ytPlayer.getPlayerState();
+  try{
+    const state=ytPlayer.getPlayerState();
 
-  if(state===YT.PlayerState.PLAYING){
-    savePosition();
-    ytPlayer.pauseVideo();
-  }else{
-    const pos=savedPosition(current);
-    if(pos>0){
-      try{ytPlayer.seekTo(pos,true)}catch(e){}
+    if(state === YT.PlayerState.PLAYING){
+      savePosition();
+      ytPlayer.pauseVideo();
+    }else{
+      const saved=getSavedPosition(current);
+      if(saved > 0 && Math.abs((ytPlayer.getCurrentTime()||0)-saved) > 2){
+        ytPlayer.seekTo(saved,true);
+      }
+      ytPlayer.playVideo();
     }
-    ytPlayer.playVideo();
-  }
+  }catch(e){}
 };
 
 $("#volume").oninput=()=>{
@@ -351,34 +302,42 @@ $("#volIcon").onclick=()=>{
   $("#volIcon").textContent=next===0 ? "🔇" : "🔊";
 };
 
-// Guardado automático de la posición cada segundo.
+// Guardar la posición periódicamente.
 saveTimer=setInterval(savePosition,1000);
 
-// Al salir de la pestaña/app se pausa y se guarda la posición.
+// Si se sale de Moly, se pausa y se guarda.
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden){
     savePosition();
-    if(ytPlayer?.pauseVideo) ytPlayer.pauseVideo();
+    try{ ytPlayer?.pauseVideo(); }catch(e){}
   }
 });
 
-window.addEventListener("pagehide",savePosition);
-window.addEventListener("beforeunload",savePosition);
+window.addEventListener("pagehide", savePosition);
+window.addEventListener("beforeunload", savePosition);
 
-// Fecha y hora exactas del dispositivo.
+// Fecha exacta del dispositivo.
 function clock(){
   const now=new Date();
+
   $("#date").textContent=new Intl.DateTimeFormat(undefined,{
-    weekday:"long",year:"numeric",month:"long",day:"numeric"
+    weekday:"long",
+    year:"numeric",
+    month:"long",
+    day:"numeric"
   }).format(now);
+
   $("#clock").textContent=now.toLocaleTimeString(undefined,{
-    hour:"2-digit",minute:"2-digit",second:"2-digit"
+    hour:"2-digit",
+    minute:"2-digit",
+    second:"2-digit"
   });
 }
+
 setInterval(clock,1000);
 clock();
 
-// Ubicación + temperatura.
+// Temperatura y ubicación.
 async function weather(lat,lon){
   try{
     const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
@@ -395,37 +354,56 @@ async function weather(lat,lon){
 function locate(){
   if(!navigator.geolocation){
     $("#place").textContent="GPS no disponible";
+    $("#coords").textContent="GPS no disponible";
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(pos=>{
-    const {latitude,longitude}=pos.coords;
-    $("#coords").textContent=`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-    weather(latitude,longitude);
-  },()=>{
-    $("#coords").textContent="Permiso de ubicación no concedido";
-    $("#place").textContent="ubicación desconocida";
-  },{
-    enableHighAccuracy:true,
-    timeout:10000,
-    maximumAge:60000
-  });
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const {latitude,longitude}=pos.coords;
+
+      $("#coords").textContent=
+        `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+
+      weather(latitude,longitude);
+    },
+    ()=>{
+      $("#coords").textContent="Permiso de ubicación no concedido";
+      $("#place").textContent="ubicación desconocida";
+    },
+    {
+      enableHighAccuracy:true,
+      timeout:10000,
+      maximumAge:0
+    }
+  );
 }
 
 locate();
-render();
 
-// Recuperar la última canción.
+// Recuperar canción anterior.
 const savedBoot=JSON.parse(localStorage.getItem("moly_song")||"null");
-current=savedBoot && songs.some(s=>s.id===savedBoot.id) ? savedBoot : songs[0];
+
+current =
+  savedBoot && songs.some(s=>s.id===savedBoot.id)
+    ? savedBoot
+    : songs[0];
 
 $("#nowTitle").textContent=current.title;
 $("#nowArtist").textContent="Milo J · Moly";
 render();
 
-// Cargar YouTube después de preparar la interfaz.
-loadYouTubeAPI();
+// YouTube API.
+window.onYouTubeIframeAPIReady=()=>{
+  if(current) makePlayer(current,false);
+};
+
+if(window.YT && YT.Player){
+  makePlayer(current,false);
+}
 </script>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
+
