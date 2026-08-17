@@ -113,7 +113,7 @@ body:after{
           <div>
             <div style="font-size:38px;margin-bottom:8px">▶</div>
             <strong>El reproductor de YouTube necesita una página web</strong>
-            <p style="color:#9ca7c8;font-size:12px;line-height:1.5">Este HTML está abierto como archivo local. Chrome/YouTube puede bloquear el reproductor incrustado (Error 153). Abrí la canción con el botón de abajo.</p>
+            <p style="color:#9ca7c8;font-size:12px;line-height:1.5">El reproductor oficial de YouTube funciona mejor cuando RitmoSL está publicado en GitHub Pages (HTTPS).</p>
             <button id="ytOpen" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#28f4ff,#628dff);font-weight:900;cursor:pointer">ABRIR EN YOUTUBE</button>
           </div>
         </div>
@@ -160,13 +160,13 @@ const songs = [
   {title:"Rincón", id:"Qip3xXCTzh4", tags:"rincon rincón"},
   {title:"Bajo De La Piel", id:"9GCyD6HexgM", tags:"bajo de la piel 2025"},
   {title:"La Vida Era Más Corta", id:"aRk5vAI9xHc", tags:"la vida era mas corta 2025"},
-  {title:"3 PECADOS DESPUÉS…", id:null, tags:"3 pecados despues 166"},
-  {title:"ANTES DE LOS 20", id:null, tags:"antes de los 20 166"},
-  {title:"NI CARLOS NI JOSE", id:null, tags:"ni carlos ni jose 166"},
-  {title:"LA TOLA Y EL VELERO", id:null, tags:"la tola y el velero morad 166"},
-  {title:"A VOS", id:null, tags:"a vos 166"},
+  {title:"3 PECADOS DESPUÉS…", id:"3BdTNRISww0", tags:"3 pecados despues 166"},
+  {title:"ANTES DE LOS 20", id:"kLDfLOmLVk0", tags:"antes de los 20 166"},
+  {title:"NI CARLOS NI JOSE", id:"ake2xlDFo3I", tags:"ni carlos ni jose 166"},
+  {title:"LA TOLA Y EL VELERO", id:"v-Oz3AGLFVI", tags:"la tola y el velero morad 166"},
+  {title:"A VOS", id:"IyKkj3fZX1w", tags:"a vos 166"},
   {title:"PARAÍSO (daña)", id:null, tags:"paraiso daña 166"},
-  {title:"ALIOLI", id:null, tags:"alioli 166"},
+  {title:"ALIOLI", id:"tOZSaQWreYE", tags:"alioli 166"},
   {title:"DIGAN", id:null, tags:"digan crtrap kelo ke 166"},
   {title:"NO HAGO TRAP", id:null, tags:"no hago trap 166"},
   {title:"I' AM", id:null, tags:"i am 166"},
@@ -180,15 +180,15 @@ const songs = [
   {title:"OLIMPO", id:null, tags:"olimpo"},
   {title:"OJALÁ", id:null, tags:"ojala bhavi"},
   {title:"LO QUE ME CAUSA", id:null, tags:"lo que me causa tini"},
-  {title:"TU MANTA", id:null, tags:"tu manta 111"},
-  {title:"CARENCIAS DE CORDURA", id:null, tags:"carencias de cordura yami safdie 111"},
+  {title:"TU MANTA", id:"p840nrvFBjg", tags:"tu manta 111"},
+  {title:"CARENCIAS DE CORDURA", id:"hfABkoRgNRg", tags:"carencias de cordura yami safdie 111"},
   {title:"DESEO PERDER (INTERLUDIO)", id:null, tags:"deseo perder interludio 111"},
-  {title:"SINCERA TE", id:null, tags:"sincera te 111"},
+  {title:"SINCERA TE", id:"du9pnst_JVs", tags:"sincera te 111"},
   {title:"TE FUI A SEGUIR", id:null, tags:"te fui a seguir yahritza 111"},
   {title:"DOM1NGO", id:null, tags:"domingo 111"},
   {title:"UNA BALA", id:null, tags:"una bala peso pluma 111"},
   {title:"ALUMBRE", id:null, tags:"alumbre nicki nicole 111"},
-  {title:"A1RE", id:null, tags:"aire 111"},
+  {title:"A1RE", id:"ydqMRSjE4Jo", tags:"aire 111"},
   {title:"FLA", id:null, tags:"fla 511"},
   {title:"NO MUCHO", id:null, tags:"no mucho 511"},
   {title:"AL BORDE", id:null, tags:"al borde 511"},
@@ -204,20 +204,27 @@ const songs = [
   {title:"Radamel", id:null, tags:"radamel"},
   {title:"El Invisible", id:null, tags:"el invisible cuti roberto carabajal"},
   {title:"Luciérnagas", id:null, tags:"luciernagas silvio rodriguez"},
-  {title:"Jangadero", id:null, tags:"jangadero mercedes sosa"},
+  {title:"Jangadero", id:"PkU5_6_KGps", tags:"jangadero mercedes sosa"},
   {title:"Tus Vueltas", id:null, tags:"tus vueltas"},
   {title:"Alphas", id:null, tags:"alphas"},
   {title:"Morning", id:null, tags:"morning"},
-  {title:"VITALICIO", id:null, tags:"vitalicio"},
+  {title:"VITALICIO", id:"JE6hsBsH5Sg", tags:"vitalicio"},
   {title:"DOM1NGO (Single)", id:null, tags:"domingo single"},
-  {title:"Buen día portación de rostro", id:null, tags:"buen dia portacion"}
+  {title:"Buen día portación de rostro", id:"ga6XaoXVJvQ", tags:"buen dia portacion"}
 ];
 
-let ytPlayer = null, current = null, progressTimer = null, pendingStart = 0, isReady = false;
+let ytPlayer = null, current = null, progressTimer = null, pendingStart = 0, isReady = false, pendingPlay = false;
+const resolvePromises = {};
 const $ = s => document.querySelector(s);
-const POS_KEY = "moly_positions_v2";
-const SONG_KEY = "moly_song_v2";
-const VOL_KEY = "moly_volume";
+const POS_KEY = "ritmosl_positions_v3";
+const SONG_KEY = "ritmosl_song_v3";
+const VOL_KEY = "ritmosl_volume";
+const ID_CACHE_KEY = "ritmosl_youtube_ids_v1";
+const SEARCH_INSTANCES = [
+  "https://inv.nadeko.net",
+  "https://invidious.nerdvpn.de",
+  "https://yt.chocolatemoo53.com"
+];
 
 function norm(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
 function positions(){try{return JSON.parse(localStorage.getItem(POS_KEY)||"{}")}catch(e){return {}}}
@@ -233,7 +240,7 @@ function savePosition(){
 function render(list=songs){
   $("#results").innerHTML = list.length ? list.map(s=>`
     <div class="track ${current?.title===s.title?'active':''}" data-title="${s.title.replace(/"/g,'&quot;')}">
-      <div class="cover">M</div><div><strong>${s.title}</strong><small>Milo J · YouTube${s.id?'':' · buscar en YouTube'}</small></div><div class="go">›</div>
+      <div class="cover">M</div><div><strong>${s.title}</strong><small>Milo J · YouTube${s.id?'':' · listo para reproducir'}</small></div><div class="go">›</div>
     </div>`).join("") : `<div class="small" style="padding:10px">No encontré esa canción en el catálogo de RitmoSL.</div>`;
   document.querySelectorAll(".track").forEach(x=>x.onclick=()=>selectSong(songs.find(s=>s.title===x.dataset.title)));
 }
@@ -243,6 +250,75 @@ function search(){
 }
 $("#search").addEventListener("input",search);
 $("#searchBtn").onclick=search;
+
+
+function loadIdCache(){
+  try{return JSON.parse(localStorage.getItem(ID_CACHE_KEY)||"{}")}catch(e){return {}}
+}
+function saveIdCache(cache){
+  try{localStorage.setItem(ID_CACHE_KEY,JSON.stringify(cache))}catch(e){}
+}
+function cacheSongId(song,id){
+  if(!song||!id)return;
+  const cache=loadIdCache();
+  cache[song.title]=id;
+  saveIdCache(cache);
+}
+function applyCachedIds(){
+  const cache=loadIdCache();
+  songs.forEach(s=>{if(!s.id && cache[s.title])s.id=cache[s.title]});
+}
+function looksLikeMiloResult(item, song){
+  const title=norm(item?.title||"");
+  const author=norm(item?.author||"");
+  const wanted=norm(song.title);
+  const hasTitle=title.includes(wanted) || wanted.split(" ").filter(Boolean).every(w=>title.includes(w));
+  const isMilo=author.includes("milo j") || author.includes("milo");
+  return hasTitle && (isMilo || title.includes("milo j"));
+}
+async function resolveSongId(song){
+  if(!song)return null;
+  if(song.id)return song.id;
+  const cache=loadIdCache();
+  if(cache[song.title]){
+    song.id=cache[song.title];
+    return song.id;
+  }
+  if(resolvePromises[song.title]) return resolvePromises[song.title];
+
+  resolvePromises[song.title]=(async ()=>{
+    const queries=[
+      `Milo J ${song.title} Video Oficial`,
+      `Milo J ${song.title}`,
+      `${song.title} Milo J`
+    ];
+    try{
+      for(const base of SEARCH_INSTANCES){
+        for(const q of queries){
+          try{
+            const url=base+"/api/v1/search?q="+encodeURIComponent(q)+"&type=video&region=AR";
+            const r=await fetch(url,{headers:{Accept:"application/json"}});
+            if(!r.ok)continue;
+            const data=await r.json();
+            const items=Array.isArray(data)?data.filter(x=>x?.type==="video"):[];
+            const best=items.find(x=>looksLikeMiloResult(x,song)) || items.find(x=>norm(x?.title||"").includes(norm(song.title)));
+            if(best?.videoId){
+              song.id=best.videoId;
+              cacheSongId(song,best.videoId);
+              return song.id;
+            }
+          }catch(e){}
+        }
+      }
+    }finally{
+      delete resolvePromises[song.title];
+    }
+    return null;
+  })();
+
+  return resolvePromises[song.title];
+}
+applyCachedIds();
 
 function createPlayer(song, startSeconds=0){
   if(!song?.id) return false;
@@ -292,33 +368,52 @@ function startProgress(){
   progressTimer=setInterval(savePosition,1000);
 }
 
-function selectSong(song){
+async function selectSong(song){
   if(!song)return;
   savePosition();
   current=song;
+  pendingPlay=false;
   localStorage.setItem(SONG_KEY,JSON.stringify({title:song.title}));
   $("#nowTitle").textContent=song.title;
   $("#nowArtist").textContent="Milo J · RitmoSL";
   render(norm($("#search").value) ? songs.filter(s=>norm(s.title+" "+s.tags).includes(norm($("#search").value))) : songs);
 
   const saved=getPosition(song.id);
+
   if(song.id){
     createPlayer(song,saved);
+    return;
+  }
+
+  ytPlayer=null;
+  isReady=false;
+  $("#yt").innerHTML=`<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:#b9c1df;background:radial-gradient(circle at 50% 30%,rgba(40,244,255,.12),transparent 55%);"><div><div style="font-size:42px;margin-bottom:10px">⏳</div><strong>Preparando ${song.title}</strong><p style="font-size:12px;line-height:1.5;color:#8f9abf;margin:8px 0 14px">RitmoSL está encontrando el video de YouTube para reproducirlo acá mismo.</p></div></div>`;
+  $("#playBtn").textContent="▶";
+
+  const id=await resolveSongId(song);
+  if(current!==song)return;
+
+  if(id){
+    render(norm($("#search").value) ? songs.filter(s=>norm(s.title+" "+s.tags).includes(norm($("#search").value))) : songs);
+    createPlayer(song,getPosition(id));
   }else{
-    ytPlayer=null;
-    isReady=false;
-    $("#yt").innerHTML=`<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:#b9c1df;background:radial-gradient(circle at 50% 30%,rgba(40,244,255,.12),transparent 55%);"><div><div style="font-size:42px;margin-bottom:10px">▶</div><strong>Esta canción está en el catálogo</strong><p style="font-size:12px;line-height:1.5;color:#8f9abf;margin:8px 0 14px">El reproductor de YouTube se abrirá con la búsqueda oficial de la canción.</p><button id="ytSearch" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#28f4ff,#628dff);font-weight:900;cursor:pointer">BUSCAR EN YOUTUBE</button></div></div>`;
-    $("#ytSearch").onclick=()=>window.open("https://www.youtube.com/results?search_query="+encodeURIComponent("Milo J "+song.title),"_blank","noopener");
-    $("#playBtn").textContent="▶";
-    $("#playerCard").classList.remove("playing");
+    $("#yt").innerHTML=`<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:#b9c1df;background:radial-gradient(circle at 50% 30%,rgba(255,61,129,.12),transparent 55%);"><div><div style="font-size:42px;margin-bottom:10px">⚠️</div><strong>No pude encontrar el video</strong><p style="font-size:12px;line-height:1.5;color:#8f9abf;margin:8px 0 14px">Probá de nuevo en unos segundos. No se abrirá YouTube fuera de RitmoSL.</p></div></div>`;
   }
 }
 
-$("#playBtn").onclick=()=>{
+
+$("#playBtn").onclick=async ()=>{
   if(!current)return;
 
   if(!current.id){
-    window.open("https://www.youtube.com/results?search_query="+encodeURIComponent("Milo J "+current.title),"_blank","noopener");
+    pendingPlay=true;
+    const id=await resolveSongId(current);
+    if(current?.id) render(norm($("#search").value) ? songs.filter(s=>norm(s.title+" "+s.tags).includes(norm($("#search").value))) : songs);
+    if(id){
+      createPlayer(current,getPosition(id));
+      return;
+    }
+    pendingPlay=false;
     return;
   }
 
@@ -338,6 +433,7 @@ $("#playBtn").onclick=()=>{
     }
   }catch(e){}
 };
+
 
 $("#volIcon").onclick=()=>{
   const v=+$("#volume").value;
