@@ -77,7 +77,12 @@ body:after{
 .bar:nth-child(2){animation-delay:.1s}.bar:nth-child(3){animation-delay:.25s}.bar:nth-child(4){animation-delay:.05s}.bar:nth-child(5){animation-delay:.3s}.bar:nth-child(6){animation-delay:.15s}.bar:nth-child(7){animation-delay:.35s}.bar:nth-child(8){animation-delay:.2s}
 @keyframes eq{to{height:34px}}
 .footer{text-align:center;color:#6f789a;font-size:11px;margin:18px 0}
-@media(max-width:520px){.weather{padding:8px 10px}.logo{font-size:30px}.vol{width:74px}}
+
+.infoGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.card{border:1px solid var(--line);border-radius:21px;padding:14px;background:rgba(255,255,255,.04)}
+.card h3{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--cyan);margin:0 0 8px}
+.card p{margin:0;color:#c3c8df;font-size:12px;line-height:1.55}
+@media(max-width:520px){.infoGrid{grid-template-columns:1fr}.weather{padding:8px 10px}.logo{font-size:30px}.vol{width:74px}}
 </style>
 </head>
 <body>
@@ -128,159 +133,205 @@ body:after{
     </section>
   </section>
 
+
+  <div class="infoGrid">
+    <div class="card">
+      <h3>Fecha exacta</h3>
+      <p id="date">--</p>
+      <p id="clock">--:--:--</p>
+    </div>
+    <div class="card">
+      <h3>Ubicación</h3>
+      <p id="coords">Esperando permiso…</p>
+      <p class="small">La ubicación se usa para consultar el clima.</p>
+    </div>
+  </div>
+
   <div class="footer">Moly · interfaz original · reproductor oficial de YouTube</div>
 </main>
 
 
 <script>
 const songs = [
-  {title:"M.A.I", id:"MldGX_mbS-o", tags:"mai m a i"},
-  {title:"Rara Vez", id:"aBSkvI0CkgU", tags:"rara vez"},
+  {title:"M.A.I", id:"MldGX_mbS-o", tags:"mai m a i 111"},
+  {title:"Rara Vez", id:"aBSkvI0CkgU", tags:"rara vez taiu"},
   {title:"Morocha", id:"jMNRg3nHwU0", tags:"morocha"},
   {title:"Milagrosa", id:"9AEpbNi88F0", tags:"milagrosa"},
-  {title:"Rincón", id:"Qip3xXCTzh4", tags:"rincon rincón"}
+  {title:"Rincón", id:"Qip3xXCTzh4", tags:"rincon rincón"},
+  {title:"Bajo De La Piel", id:"9GCyD6HexgM", tags:"bajo de la piel 2025"},
+  {title:"La Vida Era Más Corta", id:"aRk5vAI9xHc", tags:"la vida era mas corta 2025"},
+  {title:"3 PECADOS DESPUÉS…", id:null, tags:"3 pecados despues 166"},
+  {title:"ANTES DE LOS 20", id:null, tags:"antes de los 20 166"},
+  {title:"NI CARLOS NI JOSE", id:null, tags:"ni carlos ni jose 166"},
+  {title:"LA TOLA Y EL VELERO", id:null, tags:"la tola y el velero morad 166"},
+  {title:"A VOS", id:null, tags:"a vos 166"},
+  {title:"PARAÍSO (daña)", id:null, tags:"paraiso daña 166"},
+  {title:"ALIOLI", id:null, tags:"alioli 166"},
+  {title:"DIGAN", id:null, tags:"digan crtrap kelo ke 166"},
+  {title:"NO HAGO TRAP", id:null, tags:"no hago trap 166"},
+  {title:"I' AM", id:null, tags:"i am 166"},
+  {title:"SANGRE PARA DERRAMAR", id:null, tags:"sangre para derramar 166"},
+  {title:"HIPPIE", id:null, tags:"hippie 166"},
+  {title:"RETIRADA", id:null, tags:"retirada 166 deluxe"},
+  {title:"LA TORTURA", id:null, tags:"la tortura cerounno"},
+  {title:"BUEN DÍA PORTACIÓN DE ROSTRO", id:null, tags:"buen dia portacion de rostro"},
+  {title:"DAÑA (ELVIRA)", id:null, tags:"daña elvira"},
+  {title:"NO NO", id:null, tags:"no no munic hb"},
+  {title:"OLIMPO", id:null, tags:"olimpo"},
+  {title:"OJALÁ", id:null, tags:"ojala bhavi"},
+  {title:"LO QUE ME CAUSA", id:null, tags:"lo que me causa tini"},
+  {title:"TU MANTA", id:null, tags:"tu manta 111"},
+  {title:"CARENCIAS DE CORDURA", id:null, tags:"carencias de cordura yami safdie 111"},
+  {title:"DESEO PERDER (INTERLUDIO)", id:null, tags:"deseo perder interludio 111"},
+  {title:"SINCERA TE", id:null, tags:"sincera te 111"},
+  {title:"TE FUI A SEGUIR", id:null, tags:"te fui a seguir yahritza 111"},
+  {title:"DOM1NGO", id:null, tags:"domingo 111"},
+  {title:"UNA BALA", id:null, tags:"una bala peso pluma 111"},
+  {title:"ALUMBRE", id:null, tags:"alumbre nicki nicole 111"},
+  {title:"A1RE", id:null, tags:"aire 111"},
+  {title:"FLA", id:null, tags:"fla 511"},
+  {title:"NO MUCHO", id:null, tags:"no mucho 511"},
+  {title:"AL BORDE", id:null, tags:"al borde 511"},
+  {title:"511 (INTERLUDIO)", id:null, tags:"511 interludio"},
+  {title:"TOI HECHO", id:null, tags:"toi hecho 511"},
+  {title:"Ama De Mi Sol", id:null, tags:"ama de mi sol"},
+  {title:"Solifican12", id:null, tags:"solifican12"},
+  {title:"Lucia", id:null, tags:"lucia soledad"},
+  {title:"MmmM", id:null, tags:"mmmm mmmM paula prieto"},
+  {title:"Llora Llora", id:null, tags:"llora llora akriila"},
+  {title:"Recordé", id:null, tags:"recorde"},
+  {title:"Cuando El Agua Hirviendo", id:null, tags:"cuando el agua hirviendo"},
+  {title:"Radamel", id:null, tags:"radamel"},
+  {title:"El Invisible", id:null, tags:"el invisible cuti roberto carabajal"},
+  {title:"Luciérnagas", id:null, tags:"luciernagas silvio rodriguez"},
+  {title:"Jangadero", id:null, tags:"jangadero mercedes sosa"},
+  {title:"Tus Vueltas", id:null, tags:"tus vueltas"},
+  {title:"Alphas", id:null, tags:"alphas"},
+  {title:"Morning", id:null, tags:"morning"},
+  {title:"VITALICIO", id:null, tags:"vitalicio"},
+  {title:"DOM1NGO (Single)", id:null, tags:"domingo single"},
+  {title:"Buen día portación de rostro", id:null, tags:"buen dia portacion"}
 ];
 
-let ytPlayer = null;
-let current = null;
-let playerReady = false;
-let saveTimer = null;
-
+let ytPlayer = null, current = null, progressTimer = null, pendingStart = 0, isReady = false;
 const $ = s => document.querySelector(s);
+const POS_KEY = "moly_positions_v2";
+const SONG_KEY = "moly_song_v2";
+const VOL_KEY = "moly_volume";
 
-function norm(s){
-  return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
-}
-
-function positionKey(song){
-  return "moly_position_" + song.id;
-}
-
-function getSavedPosition(song){
-  const n = Number(localStorage.getItem(positionKey(song)));
-  return Number.isFinite(n) && n > 0 ? n : 0;
-}
-
+function norm(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
+function positions(){try{return JSON.parse(localStorage.getItem(POS_KEY)||"{}")}catch(e){return {}}}
+function getPosition(id){const p=positions(); return id ? Number(p[id]||0) : 0}
 function savePosition(){
-  if(!current || !ytPlayer || typeof ytPlayer.getCurrentTime !== "function") return;
+  if(!current || !ytPlayer || !ytPlayer.getCurrentTime) return;
   try{
-    const time = ytPlayer.getCurrentTime() || 0;
-    if(time > 0){
-      localStorage.setItem(positionKey(current), String(time));
-      localStorage.setItem("moly_song", JSON.stringify(current));
-    }
+    const p=positions();
+    if(current.id) p[current.id]=Math.max(0, ytPlayer.getCurrentTime()||0);
+    localStorage.setItem(POS_KEY, JSON.stringify(p));
   }catch(e){}
 }
-
 function render(list=songs){
   $("#results").innerHTML = list.length ? list.map(s=>`
-    <div class="track ${current?.id===s.id?'active':''}" data-id="${s.id}">
-      <div class="cover">M</div>
-      <div><strong>${s.title}</strong><small>Milo J · YouTube</small></div>
-      <div class="go">›</div>
-    </div>`).join("") :
-    `<div class="small" style="padding:10px">No encontré esa canción en el catálogo de Moly.</div>`;
-
-  document.querySelectorAll(".track").forEach(x=>{
-    x.onclick=()=>selectSong(songs.find(s=>s.id===x.dataset.id));
-  });
+    <div class="track ${current?.title===s.title?'active':''}" data-title="${s.title.replace(/"/g,'&quot;')}">
+      <div class="cover">M</div><div><strong>${s.title}</strong><small>Milo J · YouTube${s.id?'':' · buscar en YouTube'}</small></div><div class="go">›</div>
+    </div>`).join("") : `<div class="small" style="padding:10px">No encontré esa canción en el catálogo de Moly.</div>`;
+  document.querySelectorAll(".track").forEach(x=>x.onclick=()=>selectSong(songs.find(s=>s.title===x.dataset.title)));
 }
-
 function search(){
   const q=norm($("#search").value);
   render(q ? songs.filter(s=>norm(s.title+" "+s.tags).includes(q)) : songs);
 }
+$("#search").addEventListener("input",search);
+$("#searchBtn").onclick=search;
 
-$("#search").addEventListener("input", search);
-$("#searchBtn").onclick = search;
+function createPlayer(song, startSeconds=0){
+  if(!song?.id) return false;
+  pendingStart=Math.max(0, Number(startSeconds)||0);
+  isReady=false;
+  $("#yt").innerHTML='<div id="molyYT"></div>';
 
-function makePlayer(song, autoplay=false){
-  playerReady=false;
-
-  if(ytPlayer && typeof ytPlayer.destroy === "function"){
-    try{ ytPlayer.destroy(); }catch(e){}
+  if(window.YT && YT.Player){
+    ytPlayer=new YT.Player("molyYT",{
+      videoId:song.id,
+      playerVars:{autoplay:0,playsinline:1,rel:0,modestbranding:1,controls:0,enablejsapi:1},
+      events:{onReady:onPlayerReady,onStateChange:onPlayerStateChange}
+    });
   }
+  return true;
+}
 
-  $("#yt").innerHTML = "";
+function onPlayerReady(e){
+  isReady=true;
+  const vol=Number(localStorage.getItem(VOL_KEY)??100);
+  e.target.setVolume(vol);
+  $("#volume").value=vol;
+  $("#volIcon").textContent=vol===0?"🔇":"🔊";
+  if(pendingStart>0) e.target.seekTo(pendingStart,true);
+  $("#playBtn").textContent="▶";
+  $("#playerCard").classList.remove("playing");
+}
 
-  const start = Math.floor(getSavedPosition(song));
-
-  ytPlayer = new YT.Player("yt", {
-    videoId: song.id,
-    playerVars:{
-      autoplay: autoplay ? 1 : 0,
-      playsinline: 1,
-      rel: 0,
-      modestbranding: 1,
-      controls: 1,
-      start: start
-    },
-    events:{
-      onReady: event=>{
-        playerReady=true;
-        event.target.setVolume(100);
-        $("#volume").value=100;
-
-        if(start > 0){
-          try{ event.target.seekTo(start, true); }catch(e){}
-        }
-
-        $("#playBtn").textContent = autoplay ? "❚❚" : "▶";
-        $("#playerCard").classList.toggle("playing", autoplay);
-      },
-
-      onStateChange: event=>{
-        if(event.data === YT.PlayerState.PLAYING){
-          $("#playBtn").textContent="❚❚";
-          $("#playerCard").classList.add("playing");
-        }else{
-          $("#playBtn").textContent="▶";
-          $("#playerCard").classList.remove("playing");
-
-          if(event.data === YT.PlayerState.PAUSED){
-            savePosition();
-          }
-
-          if(event.data === YT.PlayerState.ENDED){
-            localStorage.removeItem(positionKey(current));
-          }
-        }
-      }
+function onPlayerStateChange(e){
+  if(!window.YT) return;
+  const playing=e.data===YT.PlayerState.PLAYING;
+  $("#playBtn").textContent=playing?"❚❚":"▶";
+  $("#playerCard").classList.toggle("playing",playing);
+  if(playing) startProgress();
+  else {savePosition(); clearInterval(progressTimer);}
+  if(e.data===YT.PlayerState.ENDED){
+    savePosition();
+    if(current?.id){
+      const p=positions();
+      delete p[current.id];
+      localStorage.setItem(POS_KEY,JSON.stringify(p));
     }
-  });
+  }
+}
+function startProgress(){
+  clearInterval(progressTimer);
+  progressTimer=setInterval(savePosition,1000);
 }
 
 function selectSong(song){
-  if(!song) return;
-
+  if(!song)return;
   savePosition();
-
   current=song;
-  localStorage.setItem("moly_song", JSON.stringify(song));
-
+  localStorage.setItem(SONG_KEY,JSON.stringify({title:song.title}));
   $("#nowTitle").textContent=song.title;
   $("#nowArtist").textContent="Milo J · Moly";
+  render(norm($("#search").value) ? songs.filter(s=>norm(s.title+" "+s.tags).includes(norm($("#search").value))) : songs);
 
-  const q=norm($("#search").value);
-  render(q ? songs.filter(s=>norm(s.title+" "+s.tags).includes(q)) : songs);
-
-  if(window.YT && YT.Player){
-    makePlayer(song, false);
+  const saved=getPosition(song.id);
+  if(song.id){
+    createPlayer(song,saved);
+  }else{
+    ytPlayer=null;
+    isReady=false;
+    $("#yt").innerHTML=`<div style="height:100%;display:grid;place-items:center;text-align:center;padding:24px;color:#b9c1df;background:radial-gradient(circle at 50% 30%,rgba(40,244,255,.12),transparent 55%);"><div><div style="font-size:42px;margin-bottom:10px">▶</div><strong>Esta canción está en el catálogo</strong><p style="font-size:12px;line-height:1.5;color:#8f9abf;margin:8px 0 14px">El reproductor de YouTube se abrirá con la búsqueda oficial de la canción.</p><button id="ytSearch" style="border:0;border-radius:13px;padding:11px 15px;background:linear-gradient(135deg,#28f4ff,#628dff);font-weight:900;cursor:pointer">BUSCAR EN YOUTUBE</button></div></div>`;
+    $("#ytSearch").onclick=()=>window.open("https://www.youtube.com/results?search_query="+encodeURIComponent("Milo J "+song.title),"_blank","noopener");
+    $("#playBtn").textContent="▶";
+    $("#playerCard").classList.remove("playing");
   }
 }
 
 $("#playBtn").onclick=()=>{
-  if(!current || !ytPlayer || !playerReady) return;
+  if(!current)return;
+
+  if(!current.id){
+    window.open("https://www.youtube.com/results?search_query="+encodeURIComponent("Milo J "+current.title),"_blank","noopener");
+    return;
+  }
+
+  if(!ytPlayer || !isReady)return;
 
   try{
     const state=ytPlayer.getPlayerState();
-
-    if(state === YT.PlayerState.PLAYING){
+    if(state===YT.PlayerState.PLAYING){
       savePosition();
       ytPlayer.pauseVideo();
     }else{
-      const saved=getSavedPosition(current);
-      if(saved > 0 && Math.abs((ytPlayer.getCurrentTime()||0)-saved) > 2){
+      const saved=getPosition(current.id);
+      if(saved>0 && Math.abs((ytPlayer.getCurrentTime()||0)-saved)>2){
         ytPlayer.seekTo(saved,true);
       }
       ytPlayer.playVideo();
@@ -288,121 +339,79 @@ $("#playBtn").onclick=()=>{
   }catch(e){}
 };
 
-$("#volume").oninput=()=>{
-  const v=+$("#volume").value;
-  if(ytPlayer?.setVolume) ytPlayer.setVolume(v);
-  $("#volIcon").textContent=v===0 ? "🔇" : "🔊";
-};
-
 $("#volIcon").onclick=()=>{
   const v=+$("#volume").value;
-  const next=v>0 ? 0 : 100;
+  const next=v>0?0:100;
   $("#volume").value=next;
+  localStorage.setItem(VOL_KEY,next);
   if(ytPlayer?.setVolume) ytPlayer.setVolume(next);
-  $("#volIcon").textContent=next===0 ? "🔇" : "🔊";
+  $("#volIcon").textContent=next===0?"🔇":"🔊";
+};
+$("#volume").oninput=()=>{
+  const v=+$("#volume").value;
+  localStorage.setItem(VOL_KEY,v);
+  if(ytPlayer?.setVolume) ytPlayer.setVolume(v);
+  $("#volIcon").textContent=v===0?"🔇":"🔊";
 };
 
-// Guardar la posición periódicamente.
-saveTimer=setInterval(savePosition,1000);
+window.addEventListener("beforeunload",savePosition);
+window.addEventListener("pagehide",savePosition);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)savePosition()});
 
-// Si se sale de Moly, se pausa y se guarda.
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden){
-    savePosition();
-    try{ ytPlayer?.pauseVideo(); }catch(e){}
-  }
-});
-
-window.addEventListener("pagehide", savePosition);
-window.addEventListener("beforeunload", savePosition);
-
-// Fecha exacta del dispositivo.
-function clock(){
+// Date + time panel.
+function updateClock(){
   const now=new Date();
-
-  $("#date").textContent=new Intl.DateTimeFormat(undefined,{
-    weekday:"long",
-    year:"numeric",
-    month:"long",
-    day:"numeric"
+  $("#date").textContent=new Intl.DateTimeFormat("es-AR",{
+    weekday:"long",year:"numeric",month:"long",day:"numeric"
   }).format(now);
-
-  $("#clock").textContent=now.toLocaleTimeString(undefined,{
-    hour:"2-digit",
-    minute:"2-digit",
-    second:"2-digit"
+  $("#clock").textContent=now.toLocaleTimeString("es-AR",{
+    hour:"2-digit",minute:"2-digit",second:"2-digit"
   });
 }
+updateClock();
+setInterval(updateClock,1000);
 
-setInterval(clock,1000);
-clock();
+// YouTube API: handle both the normal callback and the case where the API
+// is already cached/loaded before the callback is assigned.
+let booted=false;
+function bootYouTube(){
+  if(booted || !window.YT || !YT.Player)return;
+  booted=true;
+  const saved=JSON.parse(localStorage.getItem(SONG_KEY)||"null");
+  const song=saved?songs.find(s=>s.title===saved.title):songs[0];
+  selectSong(song||songs[0]);
+}
+window.onYouTubeIframeAPIReady=bootYouTube;
+const ytBootTimer=setInterval(()=>{
+  if(window.YT && YT.Player){
+    clearInterval(ytBootTimer);
+    bootYouTube();
+  }
+},250);
 
-// Temperatura y ubicación.
 async function weather(lat,lon){
   try{
     const url=`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`;
-    const r=await fetch(url);
-    const d=await r.json();
-
+    const r=await fetch(url); const d=await r.json();
     $("#temp").textContent=Math.round(d.current.temperature_2m)+"°";
-    $("#place").textContent=(d.timezone||"hora local").replaceAll("_"," ");
-  }catch(e){
-    $("#place").textContent="clima no disponible";
-  }
+    const tz=d.timezone||"hora local";
+    $("#place").textContent=tz.replaceAll("_"," ");
+  }catch(e){$("#place").textContent="clima no disponible"}
 }
-
 function locate(){
-  if(!navigator.geolocation){
-    $("#place").textContent="GPS no disponible";
-    $("#coords").textContent="GPS no disponible";
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(
-    pos=>{
-      const {latitude,longitude}=pos.coords;
-
-      $("#coords").textContent=
-        `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-
-      weather(latitude,longitude);
-    },
-    ()=>{
-      $("#coords").textContent="Permiso de ubicación no concedido";
-      $("#place").textContent="ubicación desconocida";
-    },
-    {
-      enableHighAccuracy:true,
-      timeout:10000,
-      maximumAge:0
-    }
-  );
+  if(!navigator.geolocation){$("#place").textContent="GPS no disponible";return}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const {latitude,longitude}=pos.coords;
+    $("#coords").textContent=`${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+    weather(latitude,longitude);
+  },()=>{
+    $("#place").textContent="ubicación desconocida";
+    $("#coords").textContent="Permiso de ubicación no concedido";
+  },{enableHighAccuracy:true,timeout:10000,maximumAge:60000});
 }
-
 locate();
 
-// Recuperar canción anterior.
-const savedBoot=JSON.parse(localStorage.getItem("moly_song")||"null");
-
-current =
-  savedBoot && songs.some(s=>s.id===savedBoot.id)
-    ? savedBoot
-    : songs[0];
-
-$("#nowTitle").textContent=current.title;
-$("#nowArtist").textContent="Milo J · Moly";
-render();
-
-// YouTube API.
-window.onYouTubeIframeAPIReady=()=>{
-  if(current) makePlayer(current,false);
-};
-
-if(window.YT && YT.Player){
-  makePlayer(current,false);
-}
 </script>
-
 <script src="https://www.youtube.com/iframe_api"></script>
 </body>
 </html>
